@@ -1,49 +1,30 @@
+#!/usr/bin/env python3
 # report.py
 #
 # Exercise 2.4
 
-import csv
+import sys
+
+from fileparse import parse_csv
 
 
 def read_portfolio(filename):
-    portfolio = []
-
-    with open(filename, 'rt') as f:
-        rows = csv.reader(f)
-        headers = next(rows)
-        for i, row in enumerate(rows, start=1):
-            record = dict(zip(headers, row))
-            try:
-                record['shares'] = int(record['shares'])
-                record['price'] = float(record['price'])
-                portfolio.append(record)
-            except ValueError:
-                print(f'Error parsing row {i}: {row}... Skipping.')
-
-    return portfolio
+    with open(filename, 'rt') as lines:
+        return parse_csv(lines, select=['name', 'shares', 'price'],
+                         types=[str, int, float])
 
 
 def read_prices(filename):
-    prices = {}
-
-    with open(filename, 'rt') as f:
-        rows = csv.reader(f)
-        for i, row in enumerate(rows, start=1):
-            try:
-                name, price = row
-                prices[name] = float(price)
-            except ValueError:
-                print('Row {i}: Error parsing: {row}')
-
-    return prices
+    with open(filename, 'rt') as lines:
+        return dict(parse_csv(lines, has_headers=False, types=[str, float]))
 
 
 def portfolio_cost(portfolio):
-    return sum(holding['shares'] * holding['price'] for holding in portfolio)
+    return sum(h['shares'] * h['price'] for h in portfolio)
 
 
 def portfolio_value(portfolio, prices):
-    return sum(holding['shares'] * prices[holding['name']] for holding in portfolio)
+    return sum(h['shares'] * prices[h['name']] for h in portfolio)
 
 
 def portfolio_gain(portfolio, prices):
@@ -72,12 +53,28 @@ def print_report(report):
         print(f'{name:>10s} {shares:>10d} {price:>10s} {change:>10.2f}')
 
 
-portfolio = read_portfolio('Data/portfolio.csv')
-prices = read_prices('Data/prices.csv')
-value = portfolio_value(portfolio, prices)
-gain = portfolio_gain(portfolio, prices)
-print(f'Current portfolio value is: ${value:10.2f}')
-print(f'Total gain/loss is: ${gain:10.2f}')
+def portfolio_report(portfolio_filename, prices_filename):
+    portfolio = read_portfolio(portfolio_filename)
+    prices = read_prices(prices_filename)
 
-report = make_report(portfolio, prices)
-print_report(report)
+    report = make_report(portfolio, prices)
+    print_report(report)
+
+    value = portfolio_value(portfolio, prices)
+    gain = portfolio_gain(portfolio, prices)
+    print(f'\nCurrent portfolio value is: ${value:10.2f}')
+    print(f'Total gain/loss is: ${gain:10.2f}')
+
+
+def main(argv):
+    if len(argv) != 3:
+        raise SystemExit(f'Usage: {sys.argv[0]} ' 'portfile pricefile')
+
+    _, portfile, pricefile = argv
+    portfolio_report(portfile, pricefile)
+
+    sys.exit()
+
+
+if __name__ == '__main__':
+    main(sys.argv)
