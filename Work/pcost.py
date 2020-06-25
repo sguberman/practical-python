@@ -5,12 +5,12 @@
 
 import sys
 
-from report import read_portfolio
+import report
 
 
 def portfolio_cost(filename):
-    portfolio = read_portfolio(filename)
-    return sum(h['shares'] * h['price'] for h in portfolio)
+    portfolio = report.read_portfolio(filename)
+    return report.portfolio_cost(portfolio)
 
 
 def main(argv):
