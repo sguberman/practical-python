@@ -25,7 +25,7 @@ def read_prices(filename):
 
 
 def portfolio_cost(portfolio):
-    return sum(s.cost() for s in portfolio)
+    return sum(s.cost for s in portfolio)
 
 
 def portfolio_value(portfolio, prices):
