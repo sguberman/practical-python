@@ -6,17 +6,13 @@
 import sys
 
 from fileparse import parse_csv
-from stock import Stock
+from portfolio import Portfolio
 from tableformat import create_formatter
 
 
-def read_portfolio(filename):
+def read_portfolio(filename, **opts):
     with open(filename, 'rt') as lines:
-        portdicts = parse_csv(lines,
-                              select=['name', 'shares', 'price'],
-                              types=[str, int, float])
-
-    return [Stock(d['name'], d['shares'], d['price']) for d in portdicts]
+        return Portfolio.from_csv(lines)
 
 
 def read_prices(filename):
@@ -25,7 +21,7 @@ def read_prices(filename):
 
 
 def portfolio_cost(portfolio):
-    return sum(s.cost for s in portfolio)
+    return portfolio.total_cost
 
 
 def portfolio_value(portfolio, prices):
