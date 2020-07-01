@@ -1,0 +1,5 @@
+# Manifest.in
+
+include README.md
+include *.csv
+include print-report.py

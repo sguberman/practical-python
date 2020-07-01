@@ -1,8 +1,8 @@
 # ticker.py
 
-from follow import follow
-from report import read_portfolio
-from tableformat import create_formatter
+from .follow import follow
+from .report import read_portfolio
+from .tableformat import create_formatter
 
 import csv
 
